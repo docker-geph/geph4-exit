@@ -1,0 +1,42 @@
+name: Generate docker images
+on:
+  workflow_dispatch:
+  release:
+    types: [ released ]
+jobs:
+  push_to_registry:
+    name: Push Docker image to Docker Hub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set variables
+        run: |
+          echo "VERSION=$(cat .github/latest)" >> $GITHUB_ENV
+          echo "DATE=$(date -I)" >> $GITHUB_ENV
+          if [[ $(cat .github/latest) =~ "alpha" || $(cat .github/latest) =~ "beta" ]]; then
+            echo "TAGS=dockergeph/geph4-exit:$(cat .github/latest)" >> $GITHUB_ENV
+          else
+            echo "TAGS=dockergeph/geph4-exit:$(cat .github/latest),dockergeph/geph4-exit:latest" >> $GITHUB_ENV
+          fi
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1 
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ env.TAGS }}
+          build-args: |
+            VERSION=${{ env.VERSION }}
+            BUILD_DATE=${{ env.DATE }}
+            PACKAGE=geph4-exit

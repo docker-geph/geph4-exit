@@ -1,0 +1,19 @@
+# Where to place the secret key. On first startup, a key will be written to this location
+secret_key = "/geph4-exit.key"
+
+# Whether or not to limit the open ports to a "safe" list similar to the default policy of Tor exits.
+# See https://github.com/geph-official/geph4-exit/blob/master/src/lists.rs
+#port_whitelist = false
+
+# Whether or not to anonymize logs.
+anonymize_logs = true
+
+# Whether or not to spam gzipped sosistab traces to a given file.
+#sosistab_trace =
+
+# External interface on which VPN packets should be forwarded.
+# Must be set in order to use VPN mode!
+#nat_external_iface = "eth0"
+
+# Where to listen to for incoming sosistab connections.
+sosistab_listen = "[::]:8814"

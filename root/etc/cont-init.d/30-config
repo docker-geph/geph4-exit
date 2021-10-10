@@ -1,0 +1,18 @@
+#!/usr/bin/with-contenv bash
+
+# copy default config if not present in /config
+[[ ! -e /config/geph4-exit.toml ]] && \
+    cp /default/geph4-exit.toml /config
+
+# copy config from /config to root
+cp /config/geph4-exit.toml /geph4-exit.toml
+
+# permissions
+chown -R abc:abc \
+    /config \
+    /geph4-exit.toml
+
+chmod 700 /config
+chmod 600 \
+    /config/* \
+    /geph4-exit.toml

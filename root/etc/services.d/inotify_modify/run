@@ -1,0 +1,10 @@
+#!/usr/bin/with-contenv bash
+
+# starting inotify to watch /config/geph4-exit.toml and restart geph4-exit if changed.
+while inotifywait -e modify /config/geph4-exit.toml; do
+	cp /config/geph4-exit.toml /geph4-exit.toml
+	chown abc:abc /geph4-exit.toml
+	chmod 600 /geph4-exit.toml
+	s6-svc -h /var/run/s6/services/geph4-exit
+	echo "geph4-exit has been restarted"
+done

@@ -1,0 +1,4 @@
+#!/usr/bin/with-contenv bash
+
+exec \
+  s6-setuidgid abc /usr/bin/geph4-exit --config /geph4-exit.toml

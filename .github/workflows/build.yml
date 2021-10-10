@@ -1,0 +1,78 @@
+name: Build and publish
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/latest'
+jobs:
+  build-arm64:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set variables
+        run: |
+          echo "VERSION=$(cat .github/latest)" >> $GITHUB_ENV
+          echo "PACKAGE=geph4-exit" >> $GITHUB_ENV
+      - name: Download upstream code
+        run: curl -sL https://api.github.com/repos/geph-official/${{ env.PACKAGE }}/tarball/refs/tags/${{ env.VERSION }} | tar xvz
+      - name: Get source folder
+        run: echo "SOURCE=$(ls | grep geph-official-${{ env.PACKAGE }}-)" >> $GITHUB_ENV
+      - name: Cross compile
+        uses: docker://messense/rust-musl-cross:aarch64-musl
+        with:
+          args: 'cargo build --release --locked --manifest-path=/github/workspace/${{ env.SOURCE }}/Cargo.toml'
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.PACKAGE }}-arm64
+          path: ${{ env.SOURCE }}/target/aarch64-unknown-linux-musl/release/${{ env.PACKAGE }}
+  build-amd64:
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [ build-arm64 ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set variables
+        run: |
+          echo "VERSION=$(cat .github/latest)" >> $GITHUB_ENV
+          echo "PACKAGE=geph4-exit" >> $GITHUB_ENV
+      - name: Download upstream code
+        run: curl -sL https://api.github.com/repos/geph-official/${{ env.PACKAGE }}/tarball/refs/tags/${{ env.VERSION }} | tar xvz
+      - name: Get source folder
+        run: echo "SOURCE=$(ls | grep geph-official-${{ env.PACKAGE }}-)" >> $GITHUB_ENV
+      - name: Cross compile
+        uses: docker://messense/rust-musl-cross:x86_64-musl
+        with:
+          args: 'cargo build --release --locked --manifest-path=/github/workspace/${{ env.SOURCE }}/Cargo.toml'
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.PACKAGE }}-amd64
+          path: ${{ env.SOURCE }}/target/x86_64-unknown-linux-musl/release/${{ env.PACKAGE }}
+  release:
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [ build-amd64 ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set variables
+        run: |
+          echo "VERSION=$(cat .github/latest)" >> $GITHUB_ENV
+          echo "PACKAGE=geph4-exit" >> $GITHUB_ENV
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+      - name: Rename artifact
+        run: |
+          mkdir release
+          mv ${{ env.PACKAGE }}-amd64/${{ env.PACKAGE }} release/${{ env.PACKAGE }}-amd64
+          mv ${{ env.PACKAGE }}-arm64/${{ env.PACKAGE }} release/${{ env.PACKAGE }}-arm64
+      - name: Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: 'release/*'
+          token: ${{ secrets.REPO_TOKEN }}
+          tag: ${{ env.VERSION }}
+          commit: main
