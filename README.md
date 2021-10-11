@@ -14,6 +14,7 @@ services:
       - ./geph4-exit:/config
     ports:
       - 8814:8814
+      - 8814:8814/udp
     ulimits:
       nofile: 65536
     restart: unless-stopped
