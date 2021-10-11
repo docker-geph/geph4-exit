@@ -4,27 +4,24 @@ FROM ghcr.io/linuxserver/baseimage-alpine:3.12
 ARG BUILD_DATE
 ARG VERSION
 ARG TARGETARCH
+ARG PACKAGE
 LABEL build_version="${PACKAGE} version:- ${VERSION} Build-date:- ${BUILD_DATE}"
 LABEL maintainer="docker-geph"
 
-RUN echo "https://github.com/docker-geph/${PACKAGE}/releases/download/${VERSION}/${PACKAGE}-${TARGETARCH}"
 RUN \
  echo "**** install build packages ****" && \
  apk add --no-cache --virtual=build-dependencies \
-  curl
-RUN \
+  curl && \
  echo "**** install runtime packages ****" && \
  apk add --no-cache \
-  inotify-tools
-RUN \
+  inotify-tools && \
  echo "**** install ${PACKAGE} ****" && \
  mkdir -p \
   /tmp/${PACKAGE} && \
  curl -o \
   /tmp/${PACKAGE} -L \
   "https://github.com/docker-geph/${PACKAGE}/releases/download/${VERSION}/${PACKAGE}-${TARGETARCH}" && \
- install -Dm755 /tmp/${PACKAGE} /usr/bin/
-RUN \
+ install -Dm755 /tmp/${PACKAGE} /usr/bin/ && \
  echo "**** cleanup ****" && \
  apk del --purge \
   build-dependencies && \
