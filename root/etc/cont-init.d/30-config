@@ -7,12 +7,17 @@
 # copy config from /config to root
 cp /config/geph4-exit.toml /geph4-exit.toml
 
+# copy key from /config to root
+cp /config/geph4-exit.key /geph4-exit.key
+
 # permissions
 chown -R abc:abc \
     /config \
-    /geph4-exit.toml
+    /geph4-exit.toml \
+    /geph4-exit.key
 
 chmod 700 /config
 chmod 600 \
     /config/* \
-    /geph4-exit.toml
+    /geph4-exit.toml \
+    /geph4-exit.key
