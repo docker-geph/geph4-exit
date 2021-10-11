@@ -11,17 +11,21 @@ LABEL maintainer="docker-geph"
 RUN \
  echo "**** install build packages ****" && \
  apk add --no-cache --virtual=build-dependencies \
-  curl && \
+  curl
+RUN \
  echo "**** install runtime packages ****" && \
  apk add --no-cache \
-  inotify-tools && \
+  inotify-tools
+RUN echo "https://github.com/docker-geph/${PACKAGE}/releases/download/${VERSION}/${PACKAGE}-${TARGETARCH}"
+RUN \
  echo "**** install ${PACKAGE} ****" && \
  mkdir -p \
   /tmp/${PACKAGE} && \
  curl -o \
   /tmp/${PACKAGE} -L \
   "https://github.com/docker-geph/${PACKAGE}/releases/download/${VERSION}/${PACKAGE}-${TARGETARCH}" && \
- install -Dm755 /tmp/${PACKAGE} /usr/bin/ && \
+ install -Dm755 /tmp/${PACKAGE} /usr/bin/
+RUN \
  echo "**** cleanup ****" && \
  apk del --purge \
   build-dependencies && \
