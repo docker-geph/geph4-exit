@@ -1,5 +1,5 @@
 # Where to place the secret key. On first startup, a key will be written to this location
-secret_key = "/config/geph4-exit.key"
+secret_key = "/geph4-exit.key"
 
 # Whether or not to limit the open ports to a "safe" list similar to the default policy of Tor exits.
 # See https://github.com/geph-official/geph4-exit/blob/master/src/lists.rs
