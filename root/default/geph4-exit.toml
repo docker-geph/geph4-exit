@@ -13,7 +13,7 @@ anonymize_logs = true
 
 # External interface on which VPN packets should be forwarded.
 # Must be set in order to use VPN mode!
-#nat_external_iface = "eth0"
+nat_external_iface = "eth0"
 
 # Where to listen to for incoming sosistab connections.
 sosistab_listen = "[::]:8814"
