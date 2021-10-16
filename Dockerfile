@@ -14,6 +14,7 @@ RUN \
   curl && \
  echo "**** install runtime packages ****" && \
  apk add --no-cache \
+  iptables \
   inotify-tools && \
  echo "**** install ${PACKAGE} ****" && \
  curl -o \
